@@ -1,0 +1,153 @@
+{
+  "entities": {
+    "SiteSettings": {
+      "title": "SiteSettings",
+      "description": "Storewide branding, contact, delivery charges, and announcements",
+      "type": "object",
+      "properties": {
+        "website_name": { "type": "string", "maxLength": 100 },
+        "logo_url": { "type": "string", "maxLength": 1000 },
+        "store_tagline": { "type": "string", "maxLength": 200 },
+        "contact_phone": { "type": "string", "maxLength": 30 },
+        "contact_email": { "type": "string", "maxLength": 100 },
+        "store_address": { "type": "string", "maxLength": 300 },
+        "delivery_fee": { "type": "number" },
+        "banner_title": { "type": "string", "maxLength": 200 },
+        "banner_subtitle": { "type": "string", "maxLength": 300 },
+        "announcement": { "type": "string", "maxLength": 500 },
+        "updated_at": { "type": "string" }
+      },
+      "required": ["website_name", "delivery_fee"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Product categories created by store administrators",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "slug": { "type": "string", "maxLength": 100 },
+        "description": { "type": "string", "maxLength": 500 },
+        "image_url": { "type": "string", "maxLength": 1000 },
+        "is_active": { "type": "boolean" },
+        "created_at": { "type": "string" },
+        "updated_at": { "type": "string" }
+      },
+      "required": ["name", "slug", "is_active"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Store items managed and published by store administrators",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 200 },
+        "slug": { "type": "string", "maxLength": 200 },
+        "description": { "type": "string", "maxLength": 5000 },
+        "sku": { "type": "string", "maxLength": 50 },
+        "price": { "type": "number" },
+        "compare_at_price": { "type": "number" },
+        "stock_quantity": { "type": "number" },
+        "category_id": { "type": "string", "maxLength": 100 },
+        "category_name": { "type": "string", "maxLength": 100 },
+        "images": { "type": "array" },
+        "is_active": { "type": "boolean" },
+        "created_at": { "type": "string" },
+        "updated_at": { "type": "string" }
+      },
+      "required": ["name", "slug", "price", "stock_quantity", "is_active"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Cash on Delivery customer orders with snapshot items",
+      "type": "object",
+      "properties": {
+        "order_number": { "type": "string", "maxLength": 50 },
+        "customer_id": { "type": "string", "maxLength": 128 },
+        "customer_name": { "type": "string", "maxLength": 150 },
+        "customer_phone": { "type": "string", "maxLength": 30 },
+        "customer_email": { "type": "string", "maxLength": 100 },
+        "shipping_address": { "type": "string", "maxLength": 500 },
+        "district": { "type": "string", "maxLength": 100 },
+        "area": { "type": "string", "maxLength": 100 },
+        "customer_notes": { "type": "string", "maxLength": 500 },
+        "subtotal": { "type": "number" },
+        "delivery_fee": { "type": "number" },
+        "total_amount": { "type": "number" },
+        "payment_method": { "type": "string", "enum": ["COD"] },
+        "status": {
+          "type": "string",
+          "enum": ["Pending", "Confirmed", "Processing", "Shipped", "Delivered", "Cancelled"]
+        },
+        "items": { "type": "array" },
+        "created_at": { "type": "string" },
+        "updated_at": { "type": "string" }
+      },
+      "required": [
+        "order_number",
+        "customer_name",
+        "customer_phone",
+        "shipping_address",
+        "district",
+        "area",
+        "subtotal",
+        "delivery_fee",
+        "total_amount",
+        "payment_method",
+        "status",
+        "items"
+      ]
+    },
+    "Profile": {
+      "title": "Profile",
+      "description": "Customer personal details, addresses and preferences",
+      "type": "object",
+      "properties": {
+        "full_name": { "type": "string", "maxLength": 150 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "email": { "type": "string", "maxLength": 100 },
+        "shipping_address": { "type": "string", "maxLength": 500 },
+        "district": { "type": "string", "maxLength": 100 },
+        "area": { "type": "string", "maxLength": 100 },
+        "created_at": { "type": "string" },
+        "updated_at": { "type": "string" }
+      },
+      "required": ["full_name", "phone"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Privileged administrator record",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "maxLength": 100 },
+        "role": { "type": "string", "enum": ["admin", "superadmin"] },
+        "created_at": { "type": "string" }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/site_settings/{settingId}": {
+      "schema": "SiteSettings",
+      "description": "Public readable store configurations, admin editable"
+    },
+    "/categories/{categoryId}": {
+      "schema": "Category",
+      "description": "Categories of products in the store"
+    },
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Products catalog, public reads active, admin manages all"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Customer placed COD orders"
+    },
+    "/profiles/{userId}": {
+      "schema": "Profile",
+      "description": "Customer profiles restricted to owner and admin"
+    },
+    "/admins/{userId}": {
+      "schema": "Admin",
+      "description": "Authorized administrators list"
+    }
+  }
+}

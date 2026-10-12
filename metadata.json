@@ -1,0 +1,6 @@
+{
+  "name": "Bashar Shop",
+  "description": "Premium full-stack e-commerce store with real database, customer accounts, cash on delivery checkout, and comprehensive admin dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

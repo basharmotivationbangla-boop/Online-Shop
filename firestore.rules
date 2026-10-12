@@ -1,0 +1,67 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == "basharmotivationbangla@gmail.com" ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // Site settings: public read, admin write
+    match /site_settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Categories: public read, admin write
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Products: public can read active products, admin can read and write all
+    match /products/{productId} {
+      allow read: if resource == null || resource.data.is_active == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Orders: Anyone (or authenticated customer) can place a COD order, customer can view own, admin can view & update all
+    match /orders/{orderId} {
+      allow create: if request.resource.data.payment_method == 'COD' &&
+                       request.resource.data.status == 'Pending' &&
+                       request.resource.data.order_number is string &&
+                       request.resource.data.total_amount is number &&
+                       request.resource.data.customer_name is string &&
+                       request.resource.data.customer_phone is string;
+      allow read: if isAdmin() || (isSignedIn() && resource.data.customer_id == request.auth.uid);
+      allow update, delete: if isAdmin();
+    }
+
+    // Profiles: Owner or Admin read/write
+    match /profiles/{userId} {
+      allow read, write: if isOwner(userId) || isAdmin();
+    }
+
+    // Admins list
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+  }
+}
